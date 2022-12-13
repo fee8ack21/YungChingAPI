@@ -29,93 +29,65 @@ namespace App.BLL
 
         public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployees()
         {
-            try
-            {
-                var employees = await _repositoryWrapper.Employee.GetAll().ToListAsync();
-                var employeeDtos = _mapper.Map<List<EmployeeDto>>(employees);
+            var employees = await _repositoryWrapper.Employee.GetAll().ToListAsync();
+            var employeeDtos = _mapper.Map<List<EmployeeDto>>(employees);
 
-                return new OkObjectResult(employeeDtos);
-            }
-            catch (Exception ex)
-            {
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-            }
+            return new OkObjectResult(employeeDtos);
         }
 
         public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
         {
-            try
+            if (id <= 0)
             {
-                if (id <= 0)
-                {
-                    return new BadRequestResult();
-                }
-
-                var employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
-
-                if (employee == null)
-                {
-                    return new NotFoundResult();
-                }
-
-                var employeeDto = _mapper.Map<EmployeeDto>(employee);
-
-                return new OkObjectResult(employeeDto);
+                return new BadRequestResult();
             }
-            catch (Exception ex)
+
+            var employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
+
+            if (employee == null)
             {
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+                return new NotFoundResult();
             }
+
+            var employeeDto = _mapper.Map<EmployeeDto>(employee);
+
+            return new OkObjectResult(employeeDto);
         }
 
         public async Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employeeDto)
         {
-            try
+            if (employeeDto.EmployeeId != 0)
             {
-                if (employeeDto.EmployeeId != 0)
-                {
-                    return new BadRequestResult();
-                }
-
-                var employee = _mapper.Map<Employee>(employeeDto);
-
-                _repositoryWrapper.Employee.Add(employee);
-                await _repositoryWrapper.SaveAsync();
-
-                return new CreatedAtActionResult("GetEmployee", "Employee", new { id = employee.EmployeeId }, employee);
+                return new BadRequestResult();
             }
-            catch (Exception ex)
-            {
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-            }
+
+            var employee = _mapper.Map<Employee>(employeeDto);
+
+            _repositoryWrapper.Employee.Add(employee);
+            await _repositoryWrapper.SaveAsync();
+
+            return new CreatedAtActionResult("GetEmployee", "Employee", new { id = employee.EmployeeId }, employee);
         }
 
         public async Task<ActionResult> PutEmployee(int id, EmployeeDto employeeDto)
         {
-            try
+            if (id <= 0 || id != employeeDto.EmployeeId)
             {
-                if (id <= 0 || id != employeeDto.EmployeeId)
-                {
-                    return new BadRequestResult();
-                }
-
-                var employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
-
-                if (employee == null)
-                {
-                    return new NotFoundResult();
-                }
-
-                _mapper.Map(employeeDto, employee);
-
-                await _repositoryWrapper.SaveAsync();
-
-                return new NoContentResult();
+                return new BadRequestResult();
             }
-            catch (Exception ex)
+
+            var employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
+
+            if (employee == null)
             {
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+                return new NotFoundResult();
             }
+
+            _mapper.Map(employeeDto, employee);
+
+            await _repositoryWrapper.SaveAsync();
+
+            return new NoContentResult();
         }
 
         public async Task<ActionResult> PatchEmployee(int id, IEnumerable<PatchDatum> patchData)
@@ -129,14 +101,14 @@ namespace App.BLL
 
             if (employee == null)
             {
-                return new BadRequestResult();
+                return new NotFoundResult();
             }
 
             var document = new JsonPatchDocument();
 
             foreach (var datum in patchData)
             {
-                var operation = new Operation(op: "replace", path: datum.Path, value: datum.Value, from: "");
+                var operation = new Operation(op: "replace", path: datum.Column, value: datum.Value, from: "");
                 document.Operations.Add(operation);
             }
 
@@ -149,24 +121,17 @@ namespace App.BLL
 
         public async Task<ActionResult> DeleteEmployee(int id)
         {
-            try
+            var employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
+
+            if (employee == null)
             {
-                var employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
-
-                if (employee == null)
-                {
-                    return new NotFoundResult();
-                }
-
-                _repositoryWrapper.Employee.Remove(employee);
-                await _repositoryWrapper.SaveAsync();
-
-                return new NoContentResult();
+                return new NotFoundResult();
             }
-            catch (Exception ex)
-            {
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-            }
+
+            _repositoryWrapper.Employee.Remove(employee);
+            await _repositoryWrapper.SaveAsync();
+
+            return new NoContentResult();
         }
     }
 }

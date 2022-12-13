@@ -31,27 +31,28 @@ namespace App.PL.Controllers
 
         [HttpGet("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(EmployeeDto))]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
         {
             return await _service.GetEmployee(id);
         }
 
         [HttpPost]
+        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(EmployeeDto))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [ProducesResponseType((int)HttpStatusCode.Created)]
         public async Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employeeDto)
         {
             return await _service.PostEmployee(employeeDto);
         }
 
         [HttpPut("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> PutEmployee(int id, EmployeeDto employeeDto)
         {
             return await _service.PutEmployee(id, employeeDto);
@@ -61,15 +62,16 @@ namespace App.PL.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> PatchEmployee(int id, IEnumerable<PatchDatum> patchData)
         {
             return await _service.PatchEmployee(id, patchData);
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> DeleteEmployee(int id)
         {
             return await _service.DeleteEmployee(id);

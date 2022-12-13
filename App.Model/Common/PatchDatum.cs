@@ -8,7 +8,7 @@ namespace App.Model.Common
 {
     public class PatchDatum
     {
-        public string Path { get; set; } = null!;
+        public string Column { get; set; } = null!;
         public object? Value { get; set; }
     }
 }
