@@ -1,5 +1,7 @@
 ﻿using App.DAL.Models;
 using App.DAL.Repositories;
+using App.Model;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,18 +15,22 @@ namespace App.BLL
 {
     public class EmployeeService : IEmployeeService
     {
+        private IMapper _mapper;
         private readonly IRepositoryWrapper _repositoryWrapper;
 
-        public EmployeeService(IRepositoryWrapper repositoryWrapper)
+        public EmployeeService(IMapper mapper, IRepositoryWrapper repositoryWrapper)
         {
+            _mapper = mapper;
             _repositoryWrapper = repositoryWrapper;
         }
 
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployees()
         {
             try
             {
-                var entries = await _repositoryWrapper.Employee.GetAll().ToListAsync();
+                var _entries = await _repositoryWrapper.Employee.GetAll().ToListAsync();
+
+                var entries = _mapper.Map<List<EmployeeDto>>(_entries);
 
                 return new OkObjectResult(entries);
             }
@@ -34,15 +40,17 @@ namespace App.BLL
             }
         }
 
-        public async Task<ActionResult<Employee>> GetEmployee(long id)
+        public async Task<ActionResult<EmployeeDto>> GetEmployee(long id)
         {
             try
             {
                 if (id <= 0) { return new BadRequestResult(); }
 
-                var entry = await _repositoryWrapper.Employee.GetByCondition(x => x.EmployeeId == id).FirstOrDefaultAsync();
-
-                if (entry == null) { return new NotFoundResult(); }
+                var _entry = await _repositoryWrapper.Employee.GetByCondition(x => x.EmployeeId == id).FirstOrDefaultAsync();
+                
+                if (_entry == null) { return new NotFoundResult(); }
+                
+                var entry = _mapper.Map<EmployeeDto>(_entry);
 
                 return new OkObjectResult(entry);
             }
@@ -52,14 +60,16 @@ namespace App.BLL
             }
         }
 
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
+        public async Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employee)
         {
             try
             {
-                _repositoryWrapper.Employee.Add(employee);
+                var _employee = _mapper.Map<Employee>(employee);
+                
+                _repositoryWrapper.Employee.Add(_employee);
                 await _repositoryWrapper.SaveAsync();
 
-                return new CreatedAtActionResult("GetEmployee", "Employee", new { id = employee.EmployeeId }, employee);
+                return new CreatedAtActionResult("GetEmployee", "Employee", new { id = _employee.EmployeeId }, _employee);
             }
             catch (Exception ex)
             {
@@ -72,7 +82,7 @@ namespace App.BLL
             throw new NotImplementedException();
         }
 
-        public async Task<ActionResult<Employee>> DeleteEmployee(long id)
+        public async Task<ActionResult> DeleteEmployee(long id)
         {
             try
             {

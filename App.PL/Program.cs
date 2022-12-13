@@ -1,6 +1,7 @@
 using App.BLL;
 using App.DAL.Contexts;
 using App.DAL.Repositories;
+using App.Model;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,7 @@ builder.Services.AddDbContext<NorthwindContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Northwind"));
 });
 
+builder.Services.AddAutoMapper(typeof(EmployeeMapProfile).Assembly);
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 

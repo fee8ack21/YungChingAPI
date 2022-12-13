@@ -1,4 +1,5 @@
 ﻿using App.DAL.Models;
+using App.Model;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,10 @@ namespace App.BLL
 {
     public interface IEmployeeService
     {
-        Task<ActionResult<IEnumerable<Employee>>> GetEmployees();
-        Task<ActionResult<Employee>> GetEmployee(long id);
-        Task<ActionResult<Employee>> PostEmployee(Employee employee);
-        Task<ActionResult<Employee>> DeleteEmployee(long id);
+        Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployees();
+        Task<ActionResult<EmployeeDto>> GetEmployee(long id);
+        Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employee);
         Task<ActionResult> PutEmployee(long id, Employee employee);
+        Task<ActionResult> DeleteEmployee(long id);
     }
 }
