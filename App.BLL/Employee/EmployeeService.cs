@@ -46,8 +46,7 @@ namespace App.BLL
             {
                 if (id <= 0) { return new BadRequestResult(); }
 
-                var _entry = await _repositoryWrapper.Employee.FindByIdAsync(id);
-
+                var _entry = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
                 if (_entry == null) { return new NotFoundResult(); }
 
                 var entry = _mapper.Map<EmployeeDto>(_entry);
@@ -83,7 +82,7 @@ namespace App.BLL
             {
                 if (id <= 0 || id != employee.EmployeeId) { return new BadRequestResult(); }
 
-                var _employee = await _repositoryWrapper.Employee.FindByIdAsync(id);
+                var _employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
 
                 if (_employee == null) { return new NotFoundResult(); }
 
@@ -103,7 +102,7 @@ namespace App.BLL
         {
             try
             {
-                var employee = await _repositoryWrapper.Employee.FindByIdAsync(id);
+                var employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
 
                 if (employee == null) { return new NotFoundResult(); }
 

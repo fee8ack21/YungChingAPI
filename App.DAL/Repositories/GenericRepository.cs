@@ -18,19 +18,14 @@ namespace App.DAL.Repositories
             _context = context;
         }
 
-        public IQueryable<T> GetAll()
+        public DbSet<T> GetAll()
         {
-            return _context.Set<T>().AsNoTracking();
+            return _context.Set<T>();
         }
 
         public IQueryable<T> GetByCondition(Expression<Func<T, bool>> expression)
         {
-            return _context.Set<T>().Where(expression).AsNoTracking();
-        }
-
-        public ValueTask<T?> FindByIdAsync(int id)
-        {
-            return _context.Set<T>().FindAsync(id);
+            return _context.Set<T>().Where(expression);
         }
 
         public void Add(T entity)

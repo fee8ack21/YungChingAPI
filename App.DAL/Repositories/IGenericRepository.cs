@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -9,9 +10,8 @@ namespace App.DAL.Repositories
 {
     public interface IGenericRepository<T> where T : class
     {
-        IQueryable<T> GetAll();
+        DbSet<T> GetAll();
         IQueryable<T> GetByCondition(Expression<Func<T, bool>> expression);
-        ValueTask<T?> FindByIdAsync(int id);
         void Add(T entity);
         void AddRange(IEnumerable<T> entities);
         void Update(T entity);
