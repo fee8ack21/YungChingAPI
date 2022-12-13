@@ -1,8 +1,11 @@
 ﻿using App.DAL.Models;
 using App.DAL.Repositories;
 using App.Model;
+using App.Model.Common;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -28,11 +31,10 @@ namespace App.BLL
         {
             try
             {
-                var _entries = await _repositoryWrapper.Employee.GetAll().ToListAsync();
+                var employees = await _repositoryWrapper.Employee.GetAll().ToListAsync();
+                var employeeDtos = _mapper.Map<List<EmployeeDto>>(employees);
 
-                var entries = _mapper.Map<List<EmployeeDto>>(_entries);
-
-                return new OkObjectResult(entries);
+                return new OkObjectResult(employeeDtos);
             }
             catch (Exception ex)
             {
@@ -44,14 +46,21 @@ namespace App.BLL
         {
             try
             {
-                if (id <= 0) { return new BadRequestResult(); }
+                if (id <= 0)
+                {
+                    return new BadRequestResult();
+                }
 
-                var _entry = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
-                if (_entry == null) { return new NotFoundResult(); }
+                var employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
 
-                var entry = _mapper.Map<EmployeeDto>(_entry);
+                if (employee == null)
+                {
+                    return new NotFoundResult();
+                }
 
-                return new OkObjectResult(entry);
+                var employeeDto = _mapper.Map<EmployeeDto>(employee);
+
+                return new OkObjectResult(employeeDto);
             }
             catch (Exception ex)
             {
@@ -59,16 +68,21 @@ namespace App.BLL
             }
         }
 
-        public async Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employee)
+        public async Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employeeDto)
         {
             try
             {
-                var _employee = _mapper.Map<Employee>(employee);
+                if (employeeDto.EmployeeId != 0)
+                {
+                    return new BadRequestResult();
+                }
 
-                _repositoryWrapper.Employee.Add(_employee);
+                var employee = _mapper.Map<Employee>(employeeDto);
+
+                _repositoryWrapper.Employee.Add(employee);
                 await _repositoryWrapper.SaveAsync();
 
-                return new CreatedAtActionResult("GetEmployee", "Employee", new { id = _employee.EmployeeId }, _employee);
+                return new CreatedAtActionResult("GetEmployee", "Employee", new { id = employee.EmployeeId }, employee);
             }
             catch (Exception ex)
             {
@@ -76,17 +90,23 @@ namespace App.BLL
             }
         }
 
-        public async Task<ActionResult> PutEmployee(int id, EmployeeDto employee)
+        public async Task<ActionResult> PutEmployee(int id, EmployeeDto employeeDto)
         {
             try
             {
-                if (id <= 0 || id != employee.EmployeeId) { return new BadRequestResult(); }
+                if (id <= 0 || id != employeeDto.EmployeeId)
+                {
+                    return new BadRequestResult();
+                }
 
-                var _employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
+                var employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
 
-                if (_employee == null) { return new NotFoundResult(); }
+                if (employee == null)
+                {
+                    return new NotFoundResult();
+                }
 
-                _mapper.Map(employee, _employee);
+                _mapper.Map(employeeDto, employee);
 
                 await _repositoryWrapper.SaveAsync();
 
@@ -98,13 +118,45 @@ namespace App.BLL
             }
         }
 
+        public async Task<ActionResult> PatchEmployee(int id, IEnumerable<PatchDatum> patchData)
+        {
+            if (patchData == null || patchData.Count() == 0)
+            {
+                return new BadRequestResult();
+            }
+
+            var employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
+
+            if (employee == null)
+            {
+                return new BadRequestResult();
+            }
+
+            var document = new JsonPatchDocument();
+
+            foreach (var datum in patchData)
+            {
+                var operation = new Operation(op: "replace", path: datum.Path, value: datum.Value, from: "");
+                document.Operations.Add(operation);
+            }
+
+            document.ApplyTo(employee);
+
+            await _repositoryWrapper.SaveAsync();
+
+            return new NoContentResult();
+        }
+
         public async Task<ActionResult> DeleteEmployee(int id)
         {
             try
             {
                 var employee = await _repositoryWrapper.Employee.GetAll().FindAsync(id);
 
-                if (employee == null) { return new NotFoundResult(); }
+                if (employee == null)
+                {
+                    return new NotFoundResult();
+                }
 
                 _repositoryWrapper.Employee.Remove(employee);
                 await _repositoryWrapper.SaveAsync();

@@ -1,7 +1,10 @@
 ﻿using App.BLL;
 using App.DAL.Models;
 using App.Model;
+using App.Model.Common;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -39,15 +42,28 @@ namespace App.PL.Controllers
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.Created)]
-        public async Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employee)
+        public async Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employeeDto)
         {
-            return await _service.PostEmployee(employee);
+            return await _service.PostEmployee(employeeDto);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> PutEmployee(int id, EmployeeDto employee)
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult> PutEmployee(int id, EmployeeDto employeeDto)
         {
-            return await _service.PutEmployee(id, employee);
+            return await _service.PutEmployee(id, employeeDto);
+        }
+
+        [HttpPatch("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult> PatchEmployee(int id, IEnumerable<PatchDatum> patchData)
+        {
+            return await _service.PatchEmployee(id, patchData);
         }
 
         [HttpDelete("{id}")]
