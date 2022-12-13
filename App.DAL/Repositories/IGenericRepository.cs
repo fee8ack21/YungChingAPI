@@ -11,6 +11,7 @@ namespace App.DAL.Repositories
     {
         IQueryable<T> GetAll();
         IQueryable<T> GetByCondition(Expression<Func<T, bool>> expression);
+        ValueTask<T?> FindByIdAsync(int id);
         void Add(T entity);
         void AddRange(IEnumerable<T> entities);
         void Update(T entity);

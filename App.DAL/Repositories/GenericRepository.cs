@@ -28,6 +28,11 @@ namespace App.DAL.Repositories
             return _context.Set<T>().Where(expression).AsNoTracking();
         }
 
+        public ValueTask<T?> FindByIdAsync(int id)
+        {
+            return _context.Set<T>().FindAsync(id);
+        }
+
         public void Add(T entity)
         {
             _context.Set<T>().Add(entity);

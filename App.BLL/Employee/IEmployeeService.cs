@@ -12,9 +12,9 @@ namespace App.BLL
     public interface IEmployeeService
     {
         Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployees();
-        Task<ActionResult<EmployeeDto>> GetEmployee(long id);
+        Task<ActionResult<EmployeeDto>> GetEmployee(int id);
         Task<ActionResult<EmployeeDto>> PostEmployee(EmployeeDto employee);
-        Task<ActionResult> PutEmployee(long id, Employee employee);
-        Task<ActionResult> DeleteEmployee(long id);
+        Task<ActionResult> PutEmployee(int id, EmployeeDto employee);
+        Task<ActionResult> DeleteEmployee(int id);
     }
 }

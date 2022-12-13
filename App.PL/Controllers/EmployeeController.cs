@@ -19,7 +19,7 @@ namespace App.PL.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<Employee>))]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<EmployeeDto>))]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployees()
         {
@@ -27,11 +27,11 @@ namespace App.PL.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(Employee))]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(EmployeeDto))]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<EmployeeDto>> GetEmployee(long id)
+        public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
         {
             return await _service.GetEmployee(id);
         }
@@ -45,7 +45,7 @@ namespace App.PL.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> PutEmployee(long id, Employee employee)
+        public async Task<ActionResult> PutEmployee(int id, EmployeeDto employee)
         {
             return await _service.PutEmployee(id, employee);
         }
@@ -54,7 +54,7 @@ namespace App.PL.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public async Task<ActionResult> DeleteEmployee(long id)
+        public async Task<ActionResult> DeleteEmployee(int id)
         {
             return await _service.DeleteEmployee(id);
         }
